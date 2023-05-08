@@ -77,9 +77,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted,ref } from 'vue';
+import { defineComponent, onMounted, ref } from 'vue';
 import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
 import axios from 'axios';
+import {message} from "ant-design-vue";
 
 const listData: Record<string, string>[] = [];
 
@@ -106,15 +107,19 @@ export default defineComponent({
     const ebooks = ref();
     onMounted(()=>{
       console.log("onMounted");
-      axios.get("http://localhost:8880/ebook/getEbook?name=spring",{
+      axios.get("/ebook/getEbook",{
         params:{
           page:1,
-          size:1000
+          size:100
         }
       }).then((response)=> {
         console.log(response);
         const data = response.data;
-        ebooks.value = data.content;
+        if (data.success) {
+          ebooks.value = data.content.list;
+        } else {
+          message.error(data.message);
+        }
       });
     });
     const pagination = {
